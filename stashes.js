@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const data = require('./data.json')[1];
-const {getStashItems, getCategories, getItemsInCategory} = require('./helpers.js');
+const {getStashItems, getExplicitMods, getCategories, getSubCategories, getItemsInCategory, getItemsInSubCategory} = require('./helpers.js');
 const Categories = require('./Categories.js');
 
 const PUBLIC_STASHES = data.filter((stash) => stash.public); // array of stashes
@@ -10,4 +10,5 @@ const CATEGORIES = new Categories(ITEMS);
 // create arrays of item objects for each item category
 // const item = new Item(ITEMS[0]);
 
-console.log(getItemsInCategory(ITEMS, 'weapons'));
+const weapons = getItemsInCategory(ITEMS, 'weapons');
+console.log(getExplicitMods(ITEMS));
