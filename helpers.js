@@ -10,6 +10,13 @@ function getStashItems(data) { // separate the item data from parent objects
   return itemArray;
 }
 
+function getItemsInCategory(items, category) {
+  return items.filter((item) => {
+    const itemCategory = Object.getOwnPropertyNames(item.category)[0];
+    return itemCategory === category;
+  });
+}
+
 function getCategories(items) {
   let categoryArray = [];
   items.forEach((item) => categoryArray.push(item.category));
@@ -18,10 +25,7 @@ function getCategories(items) {
 }
 
 function getSubCategories(items, category) {
-  const itemsArray = items.filter((item) => {
-    const itemCategory = Object.getOwnPropertyNames(item.category)[0];
-    return itemCategory === category;
-  });
+  const itemsArray = getItemsInCategory(items, category);
 
   let subcategoryArray = [];
   itemsArray.forEach((item) => subcategoryArray.push(item.category[category]))
@@ -46,7 +50,9 @@ function sortCategories(array) {
   return sortedCategories;
 }
 
+
 module.exports.getStashItems = getStashItems;
+module.exports.getItemsInCategory = getItemsInCategory;
 module.exports.getCategories = getCategories;
 module.exports.getSubCategories = getSubCategories;
 module.exports.sortCategories = sortCategories;
