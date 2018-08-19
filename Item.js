@@ -1,4 +1,4 @@
-function Item(data) {
+module.exports = function Item(data) {
   this.ilvl = data.ilvl;
   this.icon = data.icon;
   this.league = data.league;
@@ -10,6 +10,4 @@ function Item(data) {
   this.explicitMods = [data.explicitMods];
   this.category = data.category;
   this.inventoryId = data.inventoryId;
-}
-
-export default Item;
+};
