@@ -10,7 +10,7 @@ function getStashItems(data) { // separate the item data from parent objects
   return itemArray;
 }
 
-function getModClasses(mod) {
+function getModClass(mod) {
   const digitString = /(\d+(\.\d+)?)/;
   const toString = /\s\d+\s(to)\s\d+\s/;
 
@@ -37,7 +37,7 @@ function getMods(items, modClass) {
 
 function getImplicitMods(items) {
   const modArray = getMods(items, 'implicitMods');
-  const modClasses = _.uniq(modArray.map((mod) => getModClasses(mod)));
+  const modClasses = _.uniq(modArray.map((mod) => getModClass(mod)));
 
   return modClasses;
 }
@@ -45,10 +45,60 @@ function getImplicitMods(items) {
 
 function getExplicitMods(items) {
   const modArray = getMods(items, 'explicitMods');
-  const modClasses = _.uniq(modArray.map((mod) => getModClasses(mod)));
+  const modClasses = _.uniq(modArray.map((mod) => getModClass(mod)));
 
   return modClasses;
+}
 
+function getItemsWithMods(items, modObj){
+  return items.filter((item) => {
+    const itemMods = getItemMods(item);
+    let hasImplicits = true;
+    let hasExplicits = true;
+
+    if ((modObj.implicitMods && !itemMods.implicitMods) || (modObj.explicitMods && !itemMods.explicitMods)) {
+      return false;
+    }
+
+    if (modObj.implicitMods) {
+      modObj.implicitMods.forEach((mod) => {
+        if (!itemMods.implicitMods.includes(mod)) {
+          hasImplicits = false;
+        }
+      });
+    }
+
+    if (modObj.explicitMods) {
+      modObj.explicitMods.forEach((mod) => {
+        if (!itemMods.explicitMods.includes(mod)) {
+          hasExplicits = false;
+        }
+      });
+    }
+
+    if (!modObj.implicitMods && modObj.explicitMods) {
+      return hasExplicits;
+    } else if (!modObj.explicitMods && modObj.implicitMods) {
+      return hasImplicits;
+    } else {
+      return hasImplicits && hasExplicits;
+    }
+
+  });
+}
+
+function getItemMods(item) {
+  const implicitMods = (item.implicitMods)
+    ? item.implicitMods.map((mod) => getModClass(mod))
+    : null;
+  const explicitMods = (item.explicitMods)
+    ? item.explicitMods.map((mod) => getModClass(mod))
+    : null;
+
+  return {
+    implicitMods: implicitMods,
+    explicitMods: explicitMods
+  }
 }
 
 function getItemsInCategory(items, category) {
@@ -101,6 +151,8 @@ function sortCategories(array) {
 module.exports.getStashItems = getStashItems;
 module.exports.getImplicitMods = getImplicitMods;
 module.exports.getExplicitMods = getExplicitMods;
+module.exports.getItemMods = getItemMods;
+module.exports.getItemsWithMods = getItemsWithMods;
 module.exports.getItemsInCategory = getItemsInCategory;
 module.exports.getItemsInSubCategory = getItemsInSubCategory;
 module.exports.getCategories = getCategories;
