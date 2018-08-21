@@ -53,8 +53,8 @@ function getExplicitMods(items) {
 function getItemsWithMods(items, modObj){
   return items.filter((item) => {
     const itemMods = getItemMods(item);
-    let hasImplicits = true;
-    let hasExplicits = true;
+    let hasImplicits = false;
+    let hasExplicits = false;
 
     if ((modObj.implicitMods && !itemMods.implicitMods) || (modObj.explicitMods && !itemMods.explicitMods)) {
       return false;
@@ -62,16 +62,16 @@ function getItemsWithMods(items, modObj){
 
     if (modObj.implicitMods) {
       modObj.implicitMods.forEach((mod) => {
-        if (!itemMods.implicitMods.includes(mod)) {
-          hasImplicits = false;
+        if (itemMods.implicitMods.includes(mod)) {
+          hasImplicits = true;
         }
       });
     }
 
     if (modObj.explicitMods) {
       modObj.explicitMods.forEach((mod) => {
-        if (!itemMods.explicitMods.includes(mod)) {
-          hasExplicits = false;
+        if (itemMods.explicitMods.includes(mod)) {
+          hasExplicits = true;
         }
       });
     }
@@ -99,6 +99,16 @@ function getItemMods(item) {
     implicitMods: implicitMods,
     explicitMods: explicitMods
   }
+}
+
+function cleanMarkup(text) {
+  const matchMarkup = /^[\w\d<>:]+>>/;
+
+  if (matchMarkup.test(text)) {
+    return text.replace(matchMarkup, '');
+  }
+
+  return text;
 }
 
 function getItemsInCategory(items, category) {
@@ -155,6 +165,7 @@ module.exports.getItemMods = getItemMods;
 module.exports.getItemsWithMods = getItemsWithMods;
 module.exports.getItemsInCategory = getItemsInCategory;
 module.exports.getItemsInSubCategory = getItemsInSubCategory;
+module.exports.cleanMarkup = cleanMarkup;
 module.exports.getCategories = getCategories;
 module.exports.getSubCategories = getSubCategories;
 module.exports.sortCategories = sortCategories;

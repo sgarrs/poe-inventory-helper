@@ -11,6 +11,7 @@ const {
   getItemsWithMods,
   getItemMods
 } = require('./helpers.js')
+const Item = require('./Item.js');
 const Categories = require('./Categories.js');
 const LEAGUE = 'Standard'
 
@@ -23,6 +24,10 @@ const CATEGORIES = new Categories(PUBLIC_ITEMS);
 // create arrays of item objects for each item category
 // const item = new Item(ITEMS[0]);
 
-console.log(getItemsWithMods(LEAGUE_ITEMS, {
-  implicitMods: ['x% increased Damage']
-}));
+const rawItemArray = getItemsWithMods(LEAGUE_ITEMS, {
+  explicitMods: ['x% increased Damage']
+});
+
+const itemArray = rawItemArray.map((item) => new Item(item));
+
+console.log(itemArray[0]);
