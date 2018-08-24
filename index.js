@@ -1,33 +1,33 @@
-const fs = require('fs');
-const request = require('request');
-const through = require('through2');
-const JSONStream = require('JSONStream');
+// TODO:
+// find the ranges of the same mod
+// sort by mod value
+// how do I determine item rarity?
+// for each item's mod, include distance from max value
+// determine item mod tiers
+// how do we tell if a modifier's value is variable?
 
-const POE_URL = 'http://api.pathofexile.com/public-stash-tabs'
-const OUTPUT_FILE = __dirname + '/data.txt';
-const JSON_FILE = __dirname + '/data.json';
+const _ = require('lodash');
+const data = require('./data.json')[1];
+const {
+  getStashItems,
+  getItemsInCategory,
+  getItemsWithMods,
+  getItemsWithName,
+  getExplicitMods,
+} = require('./helpers.js')
+const StashCollection = require('./StashCollection.js')
+const Item = require('./Item.js');
+const Categories = require('./Categories.js');
 
-const dataToFile = (url) => {
-  request(url).pipe(fs.createWriteStream(OUTPUT_FILE));
-}
+const LEAGUE = 'Standard'
+const PUBLIC_STASHES = data.filter((stash) => stash.public); // array of stashes
+const LEAGUE_STASHES = PUBLIC_STASHES.filter((stash) => stash.league === LEAGUE); // array of stashes
+const STANDARD_STASH_COLLECTION = new StashCollection(LEAGUE_STASHES);
 
-// bring in all the pages of data that the server gives us
-// poe prefixes JSON with a next_change_id
+// create arrays of item objects for each item category
+// const item = new Item(ITEMS[0]);
 
-
-// parse stash data
-const stream = through({objectMode: true}, function(buffer, _, next) {
-  const buf = buffer;
-  this.push(buf);
-  next();
-});
-
-const JSONToFile = () => {
-  fs.createReadStream(OUTPUT_FILE)
-    .pipe(JSONStream.parse('*'))
-    .pipe(stream)
-    .pipe(JSONStream.stringify())
-    .pipe(fs.createWriteStream(JSON_FILE));
-}
-
-JSONToFile();
+const modObj = {
+  explicitMods: ['Cannot be Frozen']
+};
+//console.log(STANDARD_STASH_COLLECTION.categories);
