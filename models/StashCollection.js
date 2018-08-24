@@ -9,6 +9,7 @@ class StashCollection {
     this.categories = this.getCategoryList();
   }
 
+  // return array of raw item data
   getStashItems() {
     const itemArray = [];
 
@@ -19,6 +20,8 @@ class StashCollection {
     return _.flatten(itemArray);
   }
 
+  // return array of items with specified modifiers
+  // *** need to account for flasks using an entirely different set of modifier properties
   getItemsWithMods(modObj){
     return this.items.filter((item) => {
       const itemMods = getItemMods(item);
@@ -56,11 +59,13 @@ class StashCollection {
     });
   }
 
+  // return array of items matching a name
   getItemsWithName(name) {
     const matchName = new RegExp(name);
     return this.items.filter((item) => matchName.test(item.name));
   }
 
+  // return array of items matching a category
   getItemsInCategory(category) {
     return this.items.filter((item) => {
       const itemCategory = Object.getOwnPropertyNames(item.category)[0];
@@ -68,12 +73,15 @@ class StashCollection {
     });
   }
 
+  // return array of items matching a sub-category
   getItemsInSubCategory(subcategory) {
     // assume items array is a value from getItemsInCategory
     const categoryName = this.getCategories(this.items)[0];
     return this.items.filter((item) => item.category[categoryName][0] === subcategory);
   }
 
+  // return an object of containing all unique categories and their subcategories assigned to items
+  // { category: ['subcategory', ...] }
   getCategoryList() {
     const catArray = this.getCategories();
     const obj = {};
@@ -84,19 +92,19 @@ class StashCollection {
     return obj;
   }
 
+  // return array of parent categories
   getCategories() {
     return StashCollection.sortCategories(this.items.map((item) => item.category));
   }
 
+  // return array of sub-categories for a specified category
   getSubCategories(category) {
     const itemsArray = this.getItemsInCategory(category);
 
-    let subcategoryArray = [];
-    itemsArray.forEach((item) => subcategoryArray.push(item.category[category]))
-
-    return StashCollection.sortCategories(subcategoryArray);
+    return StashCollection.sortCategories(itemsArray.map((item) => item.category[category]));
   }
 
+  // return a filtered array of unique strings
   static sortCategories(array) {
     let sortedCategories = [];
     array.forEach((a) => {

@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+// create a generic modifier by replacing the digits with x
 module.exports = function getModClass(mod) {
   const digitString = /(\d+(\.\d+)?)/;
   const toString = /\s\d+\s(to)\s\d+\s/;
@@ -17,22 +18,23 @@ module.exports = function getModClass(mod) {
   }
 }
 
-module.exports = function getMods(items, modClass) {
-  let modArray = [];
-  items.forEach((item) => { modArray.push(item[modClass]) });
-  modArray = _.flatten(modArray);
-  modArray = _.compact(modArray);
-  return modArray;
+// return array of raw modifiers from the specified mod category
+module.exports = function getMods(items, modCategory) {
+  const modArray = _.flatten(items.map((item) => item[modCategory]));
+  return _.compact(modArray);
 }
 
+// *** find the ranges of the same mod
+
+// return array of unique implicit mod classes
 module.exports = function getImplicitMods(items) {
   const modArray = getMods(items, 'implicitMods');
   const modClasses = _.uniq(modArray.map((mod) => getModClass(mod)));
 
   return modClasses;
 }
-  // find the ranges of the same mod
 
+// return array of unique explicit mod classes
 module.exports = function getExplicitMods(items) {
   const modArray = getMods(items, 'explicitMods');
   const modClasses = _.uniq(modArray.map((mod) => getModClass(mod)));
@@ -40,6 +42,7 @@ module.exports = function getExplicitMods(items) {
   return modClasses;
 }
 
+// return object of  specific item's modifiers
 module.exports = function getItemMods(item) {
   const implicitMods = (item.implicitMods)
     ? item.implicitMods.map((mod) => getModClass(mod))

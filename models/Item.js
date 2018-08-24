@@ -2,7 +2,7 @@ const request = require('request');
 
 class Item {
   constructor(data, id) {
-  // should I enforce type here?
+    // should I enforce type here?
     this.ilvl = data.ilvl;
     this.icon = Item.getItemImage(data.icon);
     this.league = data.league;
@@ -20,6 +20,7 @@ class Item {
     this.inventoryId = data.inventoryId;
     }
 
+  // clean item name from markup prefix
   static cleanMarkup(text) {
     const matchMarkup = /^[\w\d<>:]+>>/;
 
@@ -30,6 +31,7 @@ class Item {
     return text;
   }
 
+  // return image data from href to poe cdn
   static getItemImage(uri) {
     return request.get(uri, (err, res, body) => {
       if (!err && res.statusCode === 200) {
