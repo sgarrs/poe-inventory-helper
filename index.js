@@ -1,25 +1,9 @@
-// TODO:
-// find the ranges of the same mod
-// sort by mod value
-// how do I determine item rarity?
-// for each item's mod, include distance from max value
-// determine item mod tiers
-// how do we tell if a modifier's value is variable?
-
 const _ = require('lodash');
 const data = require('./data.json')[1];
-const {
-  getStashItems,
-  getItemsInCategory,
-  getItemsWithMods,
-  getItemsWithName,
-  getExplicitMods,
-} = require('./helpers.js')
-const StashCollection = require('./StashCollection.js')
-const Item = require('./Item.js');
-const Categories = require('./Categories.js');
+const StashCollection = require('./models/StashCollection.js')
+const Item = require('./models/Item.js');
 
-const LEAGUE = 'Standard'
+const LEAGUE = 'Standard';
 const PUBLIC_STASHES = data.filter((stash) => stash.public); // array of stashes
 const LEAGUE_STASHES = PUBLIC_STASHES.filter((stash) => stash.league === LEAGUE); // array of stashes
 const STANDARD_STASH_COLLECTION = new StashCollection(LEAGUE_STASHES);
@@ -31,3 +15,15 @@ const modObj = {
   explicitMods: ['Cannot be Frozen']
 };
 //console.log(STANDARD_STASH_COLLECTION.categories);
+const weapons = STANDARD_STASH_COLLECTION.getItemsInCategory('weapons');
+//const oneswords = STANDARD_STASH_COLLECTION.getItemsInSubCategory('onesword', weapons)
+
+const gems = STANDARD_STASH_COLLECTION.getItemsInCategory('gems');
+const cards = STANDARD_STASH_COLLECTION.getItemsInCategory('cards');
+const currency = STANDARD_STASH_COLLECTION.getItemsInCategory('currency');
+const flasks = STANDARD_STASH_COLLECTION.getItemsInCategory('flasks');
+const jewels = STANDARD_STASH_COLLECTION.getItemsInCategory('jewels');
+const maps = STANDARD_STASH_COLLECTION.getItemsInCategory('maps');
+const gemItems = gems.map((item) => new Item(item));
+console.log(gemItems[0].getItemCard());
+//console.log(tombfistItems.filter((item) => item.socketedItems));

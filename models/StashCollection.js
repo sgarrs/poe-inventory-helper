@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const request = require('request').defaults({encoding: null});
-const {getItemMods} = require('./helpers/modifiers.js');
+const {getItemMods} = require('../helpers/modifiers.js');
 
 class StashCollection {
   constructor(data) {
@@ -11,13 +11,7 @@ class StashCollection {
 
   // return array of raw item data
   getStashItems() {
-    const itemArray = [];
-
-    this.stashes.forEach((stash) => {
-      itemArray.push(stash.items);
-    });
-
-    return _.flatten(itemArray);
+    return _.flatten(this.stashes.map((stash) => stash.items));
   }
 
   // return array of items with specified modifiers
@@ -60,24 +54,24 @@ class StashCollection {
   }
 
   // return array of items matching a name
-  getItemsWithName(name) {
+  getItemsWithName(name, items = this.items) {
     const matchName = new RegExp(name);
-    return this.items.filter((item) => matchName.test(item.name));
+    return items.filter((item) => matchName.test(item.name));
   }
 
   // return array of items matching a category
-  getItemsInCategory(category) {
-    return this.items.filter((item) => {
+  getItemsInCategory(category, items = this.items) {
+    return items.filter((item) => {
       const itemCategory = Object.getOwnPropertyNames(item.category)[0];
       return itemCategory === category;
     });
   }
 
   // return array of items matching a sub-category
-  getItemsInSubCategory(subcategory) {
+  getItemsInSubCategory(subcategory, items = this.items) {
     // assume items array is a value from getItemsInCategory
-    const categoryName = this.getCategories(this.items)[0];
-    return this.items.filter((item) => item.category[categoryName][0] === subcategory);
+    const categoryName = this.getCategories(items)[0];
+    return items.filter((item) => item.category[categoryName][0] === subcategory);
   }
 
   // return an object of containing all unique categories and their subcategories assigned to items
@@ -93,8 +87,8 @@ class StashCollection {
   }
 
   // return array of parent categories
-  getCategories() {
-    return StashCollection.sortCategories(this.items.map((item) => item.category));
+  getCategories(items = this.items) {
+    return StashCollection.sortCategories(items.map((item) => item.category));
   }
 
   // return array of sub-categories for a specified category
