@@ -1,65 +1,102 @@
 const request = require('request');
+const {
+  getModClass,
+} = require('../helpers/modifiers');
 
 class Item {
   constructor(data, id) {
-    this.socketedItems = (data.socketedItems) ? data.socketedItems : [];
+  // general
     this.category = Object.getOwnPropertyNames(data.category).join();
-    this.subCategory = Object.values(data.category)[0].join();
-    this.stashId = id;
+    this.subCategory = Object.values(data.category)[0];
     this.inventoryId = data.inventoryId;
     this.ilvl = data.ilvl;
     //    this.icon = Item.getItemImage(data.icon);
-    this.league = data.league;
+    this.league = data.league; // do I need this?
     this.name = Item.cleanMarkup(data.name);
     this.typeLine = Item.cleanMarkup(data.typeLine);
-    this.identified = data.identified;
-    this.support = data.support;
+    this.identified = Boolean(data.identified);
+    this.corrupted = Boolean(data.corrupted);
+  // item props & mods
+    // frameType
+      // 0 normal
+      // 1 magic
+      // 2 rare
+      // 3 unique
+      // 4 gem
+      // 5 currency
+      // 6 div card
+      // 7 quest item
+      // 8 prophecy
+      // 9 relic
+    this.frameType = Number(data.frameType);
+    this.support = Boolean(data.support);
     this.properties = Item.addQuality(data.properties);
     this.additionalProperties = data.additionalProperties;
-    this.requirements = data.requirements;
-    this.mods = {
-      implicit: data.implicitMods,
-      explicit: data.explicitMods,
-    };
-    this.descrText = data.descrText;
-    this.secDescrText = data.secDescrText;
-    this.flavorText = data.flavourText; // 'murica
-    this.sockets = (data.sockets) ? data.sockets.length : 0;
+    this.requirements = [].concat(data.requirements);
+    this.reqLvl = Number(this.getRequirementValue('Level'));
+    this.reqStr = Number(this.getRequirementValue('Str'));
+    this.reqInt = Number(this.getRequirementValue('Int'));
     this.socketDetails = data.sockets;
+    this.socketsGreen = Number(this.getSocketColorNumber('G'));
+    this.socketsBlue = Number(this.getSocketColorNumber('B'));
+    this.socketsRed = Number(this.getSocketColorNumber('R'));
+    this.socketsWhite = Number(this.getSocketColorNumber('W'));
+    this.socketsAbyssal = Number(this.getSocketColorNumber('A'));
+    this.socketedItems = (data.socketedItems) ? data.socketedItems : [];
     this.stackSize = data.stackSize;
     this.maxStackSize = data.maxStackSize;
     this.artFilename = data.artFilename;
-    this.coords = { x: data.x, y: data.y };
+  // stash info
+    this.stashId = id;
+    this.x = data.x;
+    this.y = data.y;
   }
 
-  getItemCard() {
-    switch (this.category) {
-      case 'gems':
-        return {
-          header: [this.typeLine],
-          body: [this.properties, this.requirements, this.secDescrText, this.mods.explicit, 'xp bar', this.descrText]
-        }
+  getRequirementValue(name, arr = this.requirements) {
+    const match = arr.filter((req) => {
+      const reqObj = Object.assign({}, req);
+      return reqObj.name === name;
+    });
+    // each object/array is missing prototype methods
+    // why???
+    const matchObj = Object.assign({}, match[0]);
+    const matchValue = [].concat(matchObj.values);
+    const value = [].concat(matchValue[0])
+    return value[0];
+  }
+
+  static generic(mod) {
+    const digitString = /(\d+(\.\d+)?)/;
+    const toString = /\s\d+\s(to)\s\d+\s/;
+
+    const regexArray = [toString, digitString];
+    let matchedRegex = regexArray.filter((r) => r.test(mod))[0];
+
+    switch (matchedRegex) {
+      case toString:
+        return String(mod).replace(toString, ' x to x ');
+      case digitString:
+        return String(mod).replace(digitString, 'x');
       default:
-        return {
-          header: [this.name, this.typeLine],
-          body: [this.properties, this.requirements, this.mods.implicit, this.mods.explciit, this.flavorText]
-        }
+        return String(mod);
     }
   }
 
   static addQuality(props) {
-    const qualityProp = {                                          
-      name: 'Quality ',                                             
-      values: [ [ '0%', 1 ] ],                                         
-      displayMode: 0,                                              
-      type: 6                                             
-    };                                                             
-    if (props && props.length > 1 && props[1].name === 'Quality') {                                    
-      return props;                                               
+    const qualityProp = {
+      name: 'Quality ',
+      values: [ [ '0%', 1 ] ],
+      displayMode: 0,
+      type: 6
+    };
+
+    // is quality prop always at index 1?
+    if (props && props.length > 1 && props[1].name === 'Quality') {
+      return props;
     } else if (props && props.length > 1) {
-      return [props[0], qualityProp].concat(props.slice(1));                
+      return [props[0], qualityProp].concat(props.slice(1));
     }
-  };                                                             
+  };
 
   // clean item name from markup prefix
   static cleanMarkup(text) {
@@ -82,6 +119,24 @@ class Item {
           new Buffer(body).toString('base64');
       }
     });
+  }
+
+  static getGemExpPercent(addProps) {
+    const [cur, max] = (addProps && addProps[0] && addProps[0].name === 'Experience')
+      ? addProps[0].values[0][0].split('/')
+      : '';
+    return cur / max;
+  }
+
+  getSocketColorNumber(color, details = this.socketDetails) {
+    // this.socketDetails is initially non-iterable
+    details = [].concat(details).map((obj) => new Object(obj));
+    let count = 0;
+    for (let i = 0; i < details.length; i++) {
+      if (details[i].sColour === color)
+        count++;
+    }
+    return count;
   }
 };
 

@@ -14,9 +14,17 @@ class StashCollection {
     return _.flatten(this.stashes.map((stash) => stash.items));
   }
 
+  getItemsWithIlvl(ilvl, items = this.items) {
+    return items.filter((item) => item.ilvl >= ilvl);
+  }
+
+  getItemsWithProperties(propArr, items = this.items) {
+
+  }
+
   // return array of items with specified modifiers
   // *** need to account for flasks using an entirely different set of modifier properties
-  getItemsWithMods(modObj){
+  getItemsWithMods(modObj, items = this.items) {
     return this.items.filter((item) => {
       const itemMods = getItemMods(item);
       let hasImplicits = false;

@@ -14,16 +14,8 @@ const stream = through({objectMode: true}, function(buffer, _, next) {
   next();
 });
 
-function dataToFile (url, callback) {
-  request(url).pipe(fs.createWriteStream(OUTPUT_FILE), callback);
-}
-
-function JSONToFile() {
-  fs.createReadStream(OUTPUT_FILE)
-    .pipe(JSONStream.parse('*'))
-    .pipe(stream)
-    .pipe(JSONStream.stringify())
-    .pipe(fs.createWriteStream(JSON_FILE));
-}
-
-JSONToFile();
+request(POE_URL)
+  .pipe(stream)
+  .pipe(JSONStream.parse('*'))
+  .pipe(JSONStream.stringify())
+  .pipe(fs.createWriteStream(JSON_FILE));
