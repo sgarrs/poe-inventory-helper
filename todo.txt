@@ -1,0 +1,29 @@
+*TODO*:
+*   find item sockets, properties, requirements
+*?  figure out what frameType: [num] means
+*   find the ranges of the same mod
+**  return display ready set of item properties
+    -- probably should use in React component
+     item: {
+       properties: [{}, ...{}],
+       requirements: [{}, ...{}],
+       implicitMods, ['', ...''],
+       explicitMods: ['', ...''],
+       flavorText: ['', ...'']
+     }
+
+*   sort by mod value
+*?  how do I determine item rarity?
+*   for each item's mod, include distance from max value
+*+  determine item mod tiers
+*?  how do we tell if a modifier's value is variable?
+*+  combination search functions, e.g. getItemsInCategoryWithName
+    - be able to run an unknown quantity of combinations
+    - combinator function? add ... strings specifying search type which then run StashCollection getItem functions 
+    - save for the React component?
+    - account for unnecessary searches or errors in searches
+      - search for "The Princess" vs search for item.category: 'weapons' with name "The Princess"
+      - notify incompatible parameters and return a suggested result
+        - search for item.category: { weapons: ['oneaxe'] } with name "The Princess"
+        - send warning that "The Princess" is not an axe, but show results for "The Princess" swords
+*+  pagination for broad search data to limit resource drain
