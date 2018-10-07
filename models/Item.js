@@ -16,6 +16,10 @@ class Item {
     this.typeLine = Item.cleanMarkup(data.typeLine);
     this.identified = Boolean(data.identified);
     this.corrupted = Boolean(data.corrupted);
+    this.elder = Boolean(data.elder);
+    this.shaper = Boolean(data.shaper);
+    this.isRelic = Boolean(data.isRelic);
+    this.support = Boolean(data.support);
   // item props & mods
     // frameType
       // 0 normal
@@ -29,7 +33,6 @@ class Item {
       // 8 prophecy
       // 9 relic
     this.frameType = Number(data.frameType);
-    this.support = Boolean(data.support);
     this.properties = Item.addQuality(data.properties);
     this.additionalProperties = data.additionalProperties;
     this.requirements = [].concat(data.requirements);
@@ -48,8 +51,12 @@ class Item {
     this.artFilename = data.artFilename;
   // stash info
     this.stashId = id;
-    this.x = data.x;
-    this.y = data.y;
+    this.id = data.id;
+    this.price = data.note;
+    this.x = data.x;  // x pos in stash
+    this.y = data.y;  // y pos in stash
+    this.w = data.w;  // slot width
+    this.h = data.h;  // slot height
   }
 
   getRequirementValue(name, arr = this.requirements) {
