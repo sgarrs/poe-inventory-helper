@@ -1,6 +1,5 @@
 *TODO*:
-*   find item sockets, properties, requirements
-*?  figure out what frameType: [num] means
+*   find properties
 *   find the ranges of the same mod
 **  return display ready set of item properties
     -- probably should use in React component
@@ -13,7 +12,6 @@
      }
 
 *   sort by mod value
-*?  how do I determine item rarity?
 *   for each item's mod, include distance from max value
 *+  determine item mod tiers
 *?  how do we tell if a modifier's value is variable?
