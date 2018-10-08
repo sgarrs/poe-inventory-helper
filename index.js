@@ -48,4 +48,4 @@ const flaskItems = flasks.map((item) => new Item(item));
 const jewelItems = jewels.map((item) => new Item(item));
 const mapItems = maps.map((item) => new Item(item));
 
-console.log(weaponItems.filter((item) => item.frameType === 3)[0].properties[3]);
+console.log(weaponItems.filter((item) => item.frameType === 3)[0]);
