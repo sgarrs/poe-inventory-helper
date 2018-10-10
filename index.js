@@ -48,4 +48,9 @@ const flaskItems = flasks.map((item) => new Item(item));
 const jewelItems = jewels.map((item) => new Item(item));
 const mapItems = maps.map((item) => new Item(item));
 
-console.log(weaponItems.filter((item) => item.frameType === 3)[0].properties[3]);
+const rebuke = ssc.getItemsWithName('Rebuke of the Vaal');
+const rebukeItems = rebuke.map((item) => new Item(item));
+console.log(rebukeItems[0]);
+
+//console.log(weaponItems.filter((item) => item.frameType === 3)[5]);
+

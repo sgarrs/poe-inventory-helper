@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const request = require('request');
 const {
   getModClass,
@@ -6,16 +7,22 @@ const {
 class Item {
   constructor(data, id) {
   // general
-    this.category = Object.getOwnPropertyNames(data.category).join();
-    this.subCategory = Object.values(data.category)[0];
-    this.inventoryId = data.inventoryId;
-    this.ilvl = data.ilvl;
     //    this.icon = Item.getItemImage(data.icon);
     this.league = data.league; // do I need this?
+
     this.name = Item.cleanMarkup(data.name);
     this.typeLine = Item.cleanMarkup(data.typeLine);
+
+    this.category = Object.getOwnPropertyNames(data.category).join();
+    this.subCategory = Object.values(data.category)[0];
+    this.ilvl = data.ilvl;
+
     this.identified = Boolean(data.identified);
     this.corrupted = Boolean(data.corrupted);
+    this.elder = Boolean(data.elder);
+    this.shaper = Boolean(data.shaper);
+    this.isRelic = Boolean(data.isRelic);
+    this.support = Boolean(data.support);
   // item props & mods
     // frameType
       // 0 normal
@@ -29,13 +36,32 @@ class Item {
       // 8 prophecy
       // 9 relic
     this.frameType = Number(data.frameType);
-    this.support = Boolean(data.support);
-    this.properties = Item.addQuality(data.properties);
-    this.additionalProperties = data.additionalProperties;
+
     this.requirements = [].concat(data.requirements);
     this.reqLvl = Number(this.getRequirementValue('Level'));
     this.reqStr = Number(this.getRequirementValue('Str'));
     this.reqInt = Number(this.getRequirementValue('Int'));
+
+    this.properties = [].concat(Item.addQuality(data.properties));
+    // did phys get replaced by modified?
+    this.damagePhys = this.getPropertyValue(9)
+    this.damageElemental = this.getPropertyValue(10);
+    this.damageChaos = this.getPropertyValue(11);
+
+    this.damageFire = this.getElementalDamage(4);
+    this.damageCold = this.getElementalDamage(5);
+    this.damageLightning = this.getElementalDamage(6);
+
+    this.criticalStrikeChance = this.getPropertyValue(12);
+    this.attacksPerSecond = this.getPropertyValue(13);
+    this.weaponRange = this.getPropertyValue(14);
+    this.blockChance = this.getPropertyValue(15);
+    this.armour = this.getPropertyValue(16);
+    this.evasion = this.getPropertyValue(17);
+    this.energyShield = this.getPropertyValue(18);
+
+    this.additionalProperties = data.additionalProperties;
+
     this.socketDetails = data.sockets;
     this.socketsGreen = Number(this.getSocketColorNumber('G'));
     this.socketsBlue = Number(this.getSocketColorNumber('B'));
@@ -46,10 +72,43 @@ class Item {
     this.stackSize = data.stackSize;
     this.maxStackSize = data.maxStackSize;
     this.artFilename = data.artFilename;
+
   // stash info
+    this.inventoryId = data.inventoryId;
     this.stashId = id;
-    this.x = data.x;
-    this.y = data.y;
+    this.id = data.id;
+    this.price = data.note;
+    this.x = data.x;  // x pos in stash
+    this.y = data.y;  // y pos in stash
+    this.w = data.w;  // slot width
+    this.h = data.h;  // slot height
+  }
+
+  getElementalDamage(type, arr = this.damageElemental) {
+    if (arr) {
+      const match = arr.filter((value) => {
+        return value[1] === type;
+      });
+      const matchValue = [].concat(match[0]);
+      return matchValue[0];
+    }
+  }
+
+  getPropertyValue(type, arr = this.properties) {
+    const match = arr.filter((prop) => {
+      if (prop !== undefined) {
+        const propObj = Object.assign({}, prop);
+        return propObj.type === type;
+      }
+    });
+    const matchObj = Object.assign({}, match[0]);
+    const matchValue = [].concat(matchObj.values);
+
+    if (matchObj.type === 10) {
+      return matchValue;
+    } else {
+      return _.flatten(matchValue)[0];
+    }
   }
 
   getRequirementValue(name, arr = this.requirements) {
