@@ -43,12 +43,22 @@ class Item {
     this.reqInt = Number(this.getRequirementValue('Int'));
 
     this.properties = [].concat(Item.addQuality(data.properties));
-    this.dmgPhys = this.getDamage(1)
-    this.dmgModified;
-    this.dmgFire;
-    this.dmgCold;
-    this.dmgLightning;
-    this.dmgChaos;
+    // did phys get replaced by modified?
+    this.damagePhys = this.getPropertyValue(9)
+    this.damageElemental = this.getPropertyValue(10);
+    this.damageChaos = this.getPropertyValue(11);
+
+    this.damageFire = this.getElementalDamage(4);
+    this.damageCold = this.getElementalDamage(5);
+    this.damageLightning = this.getElementalDamage(6);
+
+    this.criticalStrikeChance = this.getPropertyValue(12);
+    this.attacksPerSecond = this.getPropertyValue(13);
+    this.weaponRange = this.getPropertyValue(14);
+    this.blockChance = this.getPropertyValue(15);
+    this.armour = this.getPropertyValue(16);
+    this.evasion = this.getPropertyValue(17);
+    this.energyShield = this.getPropertyValue(18);
 
     this.additionalProperties = data.additionalProperties;
 
@@ -74,16 +84,31 @@ class Item {
     this.h = data.h;  // slot height
   }
 
-  getDamage(type, arr = this.properties) {
-    const match = arr.filter((prop) => {
-      const propObj = Object.assign({}, prop);
-      const values = _.flatten([].concat(propObj.values));
-      return propObj.name !== 'Quality' && values[1] === type;
-    });
+  getElementalDamage(type, arr = this.damageElemental) {
+    if (arr) {
+      const match = arr.filter((value) => {
+        return value[1] === type;
+      });
+      const matchValue = [].concat(match[0]);
+      return matchValue[0];
+    }
+  }
 
+  getPropertyValue(type, arr = this.properties) {
+    const match = arr.filter((prop) => {
+      if (prop !== undefined) {
+        const propObj = Object.assign({}, prop);
+        return propObj.type === type;
+      }
+    });
     const matchObj = Object.assign({}, match[0]);
-    const matchValue = _.flatten([].concat(matchObj.values));
-    return matchValue[0];
+    const matchValue = [].concat(matchObj.values);
+
+    if (matchObj.type === 10) {
+      return matchValue;
+    } else {
+      return _.flatten(matchValue)[0];
+    }
   }
 
   getRequirementValue(name, arr = this.requirements) {
